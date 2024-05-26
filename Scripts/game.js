@@ -20,18 +20,20 @@ let car = {
     image: new Image()
 };
 
-car.image.src = 'car.png'; // Player's car image
+car.image.src = '../Assets/Images/players_car.png'; // Player's car
 
-// Other cars array and road image
-let otherCars = [];
-let otherCarSpeed = 3;
+// cpu cars - "opponent/game" array and road image
+let cpuCars = [];
+let cpuCarSpeed = 3;
 let score = 0;
 let gameOver = false;
 let gamePaused = false;
 let frameCount = 0;
 
 const roadImage = new Image();
-roadImage.src = 'road.jpg'; // Road image
+roadImage.src = '../Assets/Images/road.jpg'; // Road image
+
+let roadOffset = 0;
 
 document.addEventListener('keydown', keyDownHandler, false);
 document.addEventListener('keyup', keyUpHandler, false);
@@ -61,13 +63,13 @@ function drawCar(car) {
     ctx.drawImage(car.image, car.x, car.y, car.width, car.height);
 }
 
-function drawOtherCars() {
-    for (let car of otherCars) {
+function drawCpuCars() {
+    for (let car of cpuCars) {
         ctx.drawImage(car.image, car.x, car.y, car.width, car.height);
     }
 }
 
-function updateOtherCars() {
+function updateCpuCars() {
     frameCount++;
     if (frameCount % 100 === 0) {
         let x = Math.random() * (canvas.width - 50);
@@ -78,27 +80,27 @@ function updateOtherCars() {
             height: 100,
             image: new Image()
         };
-        newCar.image.src = 'other_car.png';
-        otherCars.push(newCar);
+        newCar.image.src = '../Assets/Images/cpu_car.png';
+        cpuCars.push(newCar);
     }
 
-    for (let i = 0; i < otherCars.length; i++) {
-        otherCars[i].y += otherCarSpeed;
-        if (otherCars[i].y > canvas.height) {
-            otherCars.splice(i, 1);
+    for (let i = 0; i < cpuCars.length; i++) {
+        cpuCars[i].y += cpuCarSpeed;
+        if (cpuCars[i].y > canvas.height) {
+            cpuCars.splice(i, 1);
             score += 10;
-            otherCarSpeed += 0.1;
+            cpuCarSpeed += 0.1;
         }
     }
 }
 
 function checkCollision() {
-    for (let otherCar of otherCars) {
+    for (let cpuCar of cpuCars) {
         if (
-            car.x < otherCar.x + otherCar.width &&
-            car.x + car.width > otherCar.x &&
-            car.y < otherCar.y + otherCar.height &&
-            car.y + car.height > otherCar.y
+            car.x < cpuCar.x + cpuCar.width &&
+            car.x + car.width > cpuCar.x &&
+            car.y < cpuCar.y + cpuCar.height &&
+            car.y + car.height > cpuCar.y
         ) {
             gameOver = true;
         }
@@ -112,7 +114,13 @@ function drawScore() {
 }
 
 function drawRoad() {
-    ctx.drawImage(roadImage, 0, 0, canvas.width, canvas.height);
+    roadOffset += cpuCarSpeed;
+    if (roadOffset > canvas.height) {
+        roadOffset = 0;
+    }
+
+    ctx.drawImage(roadImage, 0, roadOffset - canvas.height, canvas.width, canvas.height);
+    ctx.drawImage(roadImage, 0, roadOffset, canvas.width, canvas.height);
 }
 
 function draw() {
@@ -130,10 +138,10 @@ function draw() {
 
     drawRoad();
     drawCar(car);
-    drawOtherCars();
+    drawCpuCars();
     drawScore();
 
-    updateOtherCars();
+    updateCpuCars();
     checkCollision();
 
     if (rightPressed && car.x < canvas.width - car.width) {
@@ -153,11 +161,13 @@ function startGame() {
 }
 
 function resetGame() {
-    otherCars = [];
-    otherCarSpeed = 3;
+    cpuCars = [];
+    cpuCarSpeed = 3;
     score = 0;
     gameOver = false;
+    gamePaused = false;
     frameCount = 0;
+    roadOffset = 0;
     car.x = canvas.width / 2 - 25;
     car.y = canvas.height - 120;
 }
@@ -189,10 +199,6 @@ restartButton.addEventListener('click', () => {
 
 car.image.onload = function() {
     startScreen.classList.remove('hidden');
-};
-
-roadImage.onload = function() {
-    // Road image loaded
 };
 
 car.image.onerror = function() {
