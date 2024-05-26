@@ -10,16 +10,24 @@
     <div id="startScreen" class="screen">
         <button id="startButton">Play Game</button>
     </div>
+    <div id="difficultyScreen" class="screen hidden">
+        <p>Choose difficulty level</p>
+        <button id="easyButton" class="difficultyButton">Easy</button>
+        <button id="mediumButton" class="difficultyButton">Medium</button>
+        <button id="hardButton" class="difficultyButton">Hard</button>
+    </div>
     <div id="pauseScreen" class="screen hidden">
         <div>Game Paused</div>
         <button id="resumeButton">Resume</button>
+        <button id="exitButton">Exit</button>
     </div>
     <div id="gameOverScreen" class="screen hidden">
         <div>GAME OVER</div>
         <div id="finalScore"></div>
         <button id="restartButton">Restart</button>
+        <button id="exitButton2">Exit</button>
     </div>
     <canvas id="gameCanvas" width="480" height="640" class="hidden"></canvas>
-    <script src="Scripts/game.js"></script>
+    <script src="Scripts/test_game.js"></script>
 </body>
 </html>

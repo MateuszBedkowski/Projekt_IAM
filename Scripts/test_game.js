@@ -1,6 +1,25 @@
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
 
+// Screens
+const startScreen = document.getElementById('startScreen');
+const difficultyScreen = document.getElementById('difficultyScreen');
+const pauseScreen = document.getElementById('pauseScreen');
+const gameOverScreen = document.getElementById('gameOverScreen');
+
+// Score
+const finalScore = document.getElementById('finalScore'); // Make sure this element exists
+
+// Buttons
+const startButton = document.getElementById('startButton');
+const easyButton = document.getElementById('easyButton');
+const mediumButton = document.getElementById('mediumButton');
+const hardButton = document.getElementById('hardButton');
+const resumeButton = document.getElementById('resumeButton');
+const restartButton = document.getElementById('restartButton');
+const exitButton = document.getElementById('exitButton');
+const exitButton2 = document.getElementById('exitButton2');
+
 // Player's car object
 let car = {
     width: 50,
@@ -28,6 +47,7 @@ const roadImage = new Image();
 roadImage.src = '../Assets/Images/road.jpg'; // Road image
 
 let roadOffset = 0;
+let animationFrameId;
 
 document.addEventListener('keydown', keyDownHandler, false);
 document.addEventListener('keyup', keyUpHandler, false);
@@ -65,7 +85,7 @@ function drawCpuCars() {
 
 function updateCpuCars() {
     frameCount++;
-    if (frameCount % difficultyCar === 0) { // Add a new car every 100 frames
+    if (frameCount % difficultyCar === 0) { // Add a new car every difficultyCar frames
         let x = Math.random() * (canvas.width - 50);
         let newCar = {
             x: x,
@@ -149,18 +169,24 @@ function draw() {
         car.x -= car.speed;
     }
 
-    requestAnimationFrame(draw);
+    animationFrameId = requestAnimationFrame(draw);
 }
 
 function startGame() {
     resetGame();
     startScreen.classList.add('hidden'); // Hide starting screen
     difficultyScreen.classList.add('hidden'); // Hide difficulty screen if visible
+    gameOverScreen.classList.add('hidden'); // Hide game over screen if visible
+    pauseScreen.classList.add('hidden'); // Hide pause screen if visible
     canvas.classList.remove('hidden');
     draw();
 }
 
 function resetGame() {
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+    }
+
     cpuCars = [];
     score = 0;
     gameOver = false;
@@ -170,7 +196,6 @@ function resetGame() {
     car.x = canvas.width / 2 - 25;
     car.y = canvas.height - 120;
 
-    // Set (cpuCarSpeed, difficultyCar - how many of them show up, cpuCarSpeedIncrease - how quickly game speeds up) based on difficulty
     if (difficulty === "easy") {
         cpuCarSpeed = 5;
         difficultyCar = 120;
@@ -194,11 +219,21 @@ function togglePause() {
     }
 }
 
+function exitGame() {
+    resetGame();
+    gameOverScreen.classList.add('hidden');
+    pauseScreen.classList.add('hidden');
+    canvas.classList.add('hidden');
+    showStartScreen();
+    draw();
+}
+
 function showPauseScreen() {
     pauseScreen.classList.remove('hidden');
 }
 
 function showDifficultyScreen() {
+    startScreen.classList.add('hidden');
     difficultyScreen.classList.remove('hidden');
 }
 
@@ -207,37 +242,38 @@ function showGameOverScreen() {
     finalScore.innerText = 'Score: ' + score;
 }
 
-// Add event listeners to difficulty buttons
+function showStartScreen() {
+    startScreen.classList.remove('hidden');
+    difficultyScreen.classList.add('hidden');
+    pauseScreen.classList.add('hidden'); // Hide pause screen
+    gameOverScreen.classList.add('hidden'); // Hide game over screen
+}
+
+// Add event listeners to buttons
+startButton.addEventListener('click', showDifficultyScreen);
 easyButton.addEventListener('click', () => {
     difficulty = "easy";
     startGame();
 });
-
 mediumButton.addEventListener('click', () => {
     difficulty = "medium";
     startGame();
 });
-
 hardButton.addEventListener('click', () => {
     difficulty = "hard";
     startGame();
 });
-
-startButton.addEventListener('click', startGame);
 resumeButton.addEventListener('click', togglePause);
 restartButton.addEventListener('click', () => {
     gameOverScreen.classList.add('hidden');
     resetGame();
     draw();
 });
-exitButton.addEventListener('click', () => {
-    gameOverScreen.classList.add('hidden');
-    startScreen.classList.remove('hidden'); // Show starting screen
-    resetGame();
-});
+exitButton.addEventListener('click', exitGame);
+exitButton2.addEventListener('click', exitGame);
 
 car.image.onload = function() {
-    startScreen.classList.remove('hidden');
+    showStartScreen();
 };
 
 car.image.onerror = function() {
