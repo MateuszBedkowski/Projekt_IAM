@@ -221,11 +221,12 @@ function togglePause() {
 
 function exitGame() {
     resetGame();
+    gamePaused = true;
     gameOverScreen.classList.add('hidden');
     pauseScreen.classList.add('hidden');
     canvas.classList.add('hidden');
     showStartScreen();
-    draw();
+    //draw();
 }
 
 function showPauseScreen() {
