@@ -31,8 +31,28 @@ canvas {
 
 button {
     padding: 10px 20px;
-    margin-top: 20px;
     font-size: 16px;
     cursor: pointer;
-    display: table-row;
+    margin: 10px;
+    width: 130px;
+    height: 50px;
+}
+
+.difficultyButtonsContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+}
+
+#easyButton {
+    background-color: rgb(144, 255, 144);
+}
+
+#mediumButton {
+    background-color: rgb(253, 200, 101);
+}
+
+#hardButton {
+    background-color: rgb(255, 100, 100);
 }
